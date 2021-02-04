@@ -13,6 +13,9 @@ pragma solidity ^0.8.0;
 //  if defined as payable
 //  2) .transfer(amountInWei) - function to send wei
 
+// Require:-
+// require(condition,msgToBeDisplayed);
+
 
 contract Address {
     
