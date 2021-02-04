@@ -20,7 +20,6 @@ contract FirstContract{
     uint public uinteger = type(uint).max;
     
     
-    
     // Functions
     // function funcName(arguments) accessModifiers {
     // }
@@ -45,6 +44,63 @@ contract FirstContract{
     
     function toggle() public{
         flag=!flag;
+    }
+    
+    
+    
+    //  Address and Address payable
+    // address
+    address public sender;
+    
+    // address payable;
+    address payable public sender1;
+    
+    // function to describe working of address data type
+    function setSenderAddress() public returns(uint) {
+        sender = msg.sender;
+    }
+    
+    function getSenderBalance() public view returns(uint){
+        return (sender.balance);
+    }
+    
+    // function to describe working of address payable data type
+    function setSenderPayable() public returns(uint){
+        sender1 = payable(msg.sender);
+    }
+    
+    function getSenderPBalance() public view returns(uint){
+        return (sender1.balance);
+    }
+    
+    uint[] public array;
+    
+    function addElement(uint e) public {
+        array.push(e);
+    }
+    
+    function RemoveElement() public {
+        array.pop();
+    }
+    
+    function getArray() public view returns(uint[] memory){
+        return array;
+    }
+    
+    // enum
+    enum Mood {Happy, Sad, Angry}
+    Mood public status;
+    
+    function setMoodToHappy() public{
+        status = Mood.Happy;
+    }
+    
+    function setMoodToSad() public{
+        status = Mood.Sad;
+    }
+    
+    function setMoodToAngry() public{
+        status = Mood.Angry;
     }
     
 }
