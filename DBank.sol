@@ -6,6 +6,11 @@ contract dBank{
     
     address owner;
     
+    uint public flag;
+    
+    event Registered(string _name, uint _balance, address _adrs, uint _trxCounter);
+    event Deposited(address _adrs, uint _upBalance, uint _amt);
+    
     struct User{
         
         string name;
@@ -17,6 +22,14 @@ contract dBank{
     mapping( address => User ) users;
     
     mapping(address => bool) kyc;
+    
+    // Modifier
+    modifier KycTrue(){
+        
+        require(kyc[msg.sender], "KYC not completed yet.");
+        _;
+        
+    }
     
     // Constructor
     constructor () public {
@@ -35,6 +48,7 @@ contract dBank{
         require(msg.value >= 2 ether, "You need to deposit atleast 2 ether to open account.");
         User memory user = User(_name, msg.value, msg.sender, 1);
         users[msg.sender] = user;
+        emit Registered(_name, msg.value, msg.sender, 1);
         
     }
     
@@ -50,17 +64,16 @@ contract dBank{
         
     }
     
-    function deposit() public payable{
+    function deposit() public KycTrue payable{
         
-        require(kyc[msg.sender], "KYC not completed yet.");
         users[msg.sender].balance += msg.value;
         users[msg.sender].trxCounter += 1;
+        emit Deposited(msg.sender, users[msg.sender].balance, msg.value);
         
     }
     
-    function withdraw(uint _amt) public{
+    function withdraw(uint _amt) public KycTrue {
         
-        require( kyc[msg.sender] == true, "KYC not completed." );
         require( users[msg.sender].balance >= _amt , "Low Balance" );
         users[msg.sender].balance -= _amt;
         users[msg.sender].trxCounter += 1;
@@ -68,9 +81,8 @@ contract dBank{
         
     }
     
-    function transferTo(address payable _to, uint _amt) public{
+    function transferTo(address payable _to, uint _amt) public KycTrue {
         
-        require( kyc[msg.sender] == true, "KYC not completed." );
         require( users[msg.sender].balance >= _amt , "Low Balance" );
         users[msg.sender].balance -= _amt;
         users[msg.sender].trxCounter += 1;
@@ -98,6 +110,14 @@ contract dBank{
         
         require(msg.sender == owner, "You are not the owner." );
         return address(this).balance;
+    }
+    
+    receive () external payable {
+        if(msg.value>0){
+            deposit();
+        }else{
+            flag++;
+        }
     }
     
 }
