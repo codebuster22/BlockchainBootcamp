@@ -1,0 +1,177 @@
+///////---------------ProductManagement.sol--------------------////////////
+pragma solidity ^0.8.0;
+
+contract ProductManagement{
+    
+    enum Product_Type{}
+    enum Grade{A,B.....}
+    
+    // State Variables
+    struct Product{
+        string serial;
+        address brand;
+        address manufacturer;
+        uint8 product_type;
+        uint manufacture_date;
+        uint location;
+        uint8 grade;
+        uint price;
+        Product[] parts;
+        address[] owners;
+    }
+    
+    mapping(bytes32=>Product) public products;
+    mapping(bytes32=>address) public product_owners;
+    
+    event ProductCreated();
+    
+    
+    // Functional Declarations
+    createProduct(manufacture_date,location ,grade , price ,Product[] memory, Serial, brand,p_t){
+        bytes32 uuid = hash(serial,brand,p_t);
+        address[] memory owners = [brand];
+        Product product = Product(serial,brand,manufacturer,product_type,
+                                    manufacture_date,
+                                    location,grade,price,Product[], owners);
+        products[uuid] = product;
+        product_owners[uuid] = product;
+        emit ProductCreated();
+    }
+    
+    getProduct(Serial, brand, product_type ) returns(Product){
+        bytes32 uuid = hash(serial, brand, p_t);
+        return products[uuid];
+    }
+    
+    transferOwnership(new_owner, serial, brand, p_t){
+        bytes32 uuid = hash(serial, brand, p_t);
+        require(currentOwner = msg.sender);
+        product_owners[uuid] = new_owner;
+        products[uuid].owners.push(new_owner);
+    }
+    
+}
+
+
+
+
+
+///////////-------------------------------TransitManagement.sol------------------------------/////////////////////
+pragma solidity ^0.8.0;
+
+contract TransitManagement{
+    
+    // State Variables
+    enum State{Registered, ReadyToDispatch, InTransit, Delivered, Returned, Cancelled}
+    
+    struct Consignment{
+        uint consignment_id;
+        address sender;
+        address receiver;
+        uint from_hub;
+        uint to_hub;
+        uint next_hub;
+        uint registered_date;
+        uint expected_arrival_date;
+        uint dispatched_date;
+        uint received_date;
+        uint[] hubs_hoped;
+        uint wt;
+        uint state;
+    }
+    mapping(uint=>Consignment) public consignments;
+    uint public consignment_counter;
+    
+    struct Hub{
+        uint hub_id;
+        address manager;
+        uint location;
+        uint[] consignment_dispatched;
+        uint[] consignment_received;
+        uint[] consignment_hoped;
+        uint[] consignment_waiting;
+    }
+    mapping(uint=>Hub) public hubs;
+    uint public hub_counter;
+    
+    mapping(address=>uint[]) public sender_consignments;
+    
+    
+    // Function Declarations
+    registerConsignment(hub_id){
+        consignment_counter++;
+        Consignment consignment = Consignment(, , , , );
+        consignments[consignment_counter] = consignment;
+        sender_consignments[msg.sender].push(consignment_counter);
+        hubs[hub_id].consignment_waiting.push(consignment_counter);
+    }
+    
+    registerHub(,,,,,,){
+        hub_counter++;
+        Hub hub = Hub(,,,,,);
+        hubs[hub_counter] = hub;
+    }
+    
+    cancelConsignment(id){
+        Consignment c = consignments[id]
+        uint length = c.hubs_hoped.length;
+        uint last_hub = c.hubs_hoped[length-1];
+        require(c.state==uint(State.Delivered),"Already Delivered");
+        uint[] cw = hubs[last_hub].consignment_waiting;
+        for(uint i = 0; i<cw.length; i++){
+            if(cw[i] == id){
+                delete cw[i]
+                delete consignments[id];
+                // for loop
+            }
+        }
+        uint[] sc = sender_consignments[msg.sender];
+        for(uint i = 0; i<sc.length; i++){
+            if(sc[i] == id){
+                delete sc[i];
+            }
+        }
+    }
+    
+    updateStatus(,,,,,,){
+        hubs[curr_hub].consignment_waiting.push(consignemnt_id);
+        consignments[consignemnt_id].next_hub = _next_hub;
+        consignments[consignemnt_id].hubs_hoped.push(curr_hub);
+    }
+    
+    dispatch(){
+        next_hub = _next_hub;
+        hubs_hoped.push(curr_hub);
+        state = uint(State.InTransit);
+        if(hubs_hoped.length==0{
+            dispatched_date = block.timestamp;
+            consignments_dispatched.push(consignment_id);
+            }
+            else{
+                consignment_hoped.push(consignment_id);
+                uint[] cw = hubs[last_hub].consignment_waiting;
+            for(uint i = 0; i<cw.length; i++){
+                if(cw[i] == id){
+                delete cw[i]
+                // for loop
+            }
+        }
+            }
+    
+    delivered(){
+        next_hub to null
+        received_date to block.timestamp
+        state to Delivered
+        hubs_hoped.push(curr_hub)
+        hubs[curr_hub].consignment_received.push(consignment_id);
+    }
+    
+    getStatus(){
+        return consignments[id];
+    }
+    
+    getMyConsignments(){
+        return sender_consignments[msg.sender];
+    }
+    
+}
